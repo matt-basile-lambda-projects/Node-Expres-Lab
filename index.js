@@ -7,6 +7,19 @@ server.use(express.json());
 server.get('/', (req, res) => {
     res.send('Hello from EXPRESS LAB')
 });
+// Get All Posts
+server.get('/api/posts', (req, res) => {
+    db.find()
+    .then(posts => {
+        if(posts){
+        res.status(200).json({success: true, posts})
+      } else{
+        res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
+      }})
+      .catch(({code, message}) =>{
+        res.status(code).json({success: false, message})
+    })
+});
 
 // Add Posts
 server.post('/api/posts', (req, res) => {

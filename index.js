@@ -36,22 +36,6 @@ server.get('/api/posts/:id', (req, res) => {
         res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
     })
 });
-// Delete Single Post
-server.delete('/api/posts/:id', (req, res) => {
-    const {id} = req.params;
-    db
-    .remove(id)
-    .then(posts => { 
-        if(posts){
-        res.status(204).end();
-      } else{
-        res.status(404).json({success:false, message: 'The post with that ID does not exist.'});
-      }})
-      .catch(({}) =>{
-        res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
-    })
-});
-
 // Add Posts
 server.post('/api/posts', (req, res) => {
     const { title, contents } = req.body;
@@ -77,12 +61,50 @@ server.post('/api/posts', (req, res) => {
       .catch(() => res.status(500).json({success: false, message: "There was an error while saving the post to the database."})
   )});
 
-
-
-
-
-
-
-
+// Delete Single Post
+server.delete('/api/posts/:id', (req, res) => {
+    const {id} = req.params;
+    db
+    .remove(id)
+    .then(posts => { 
+        if(posts){
+        res.status(204).end();
+      } else{
+        res.status(404).json({success:false, message: 'The post with that ID does not exist.'});
+      }})
+      .catch(({}) =>{
+        res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
+    })
+});
+// Edit a USER
+server.put("/api/posts/:id", (req, res) => {
+    const { id } = req.params;
+    const { title, contents } = req.body;
+    const post = { title, contents };
+    console.log(post) //{ title: 'Exzc', contents: 'ent at Lambda School' }
+    if (!title || !contents) {
+        return res.status(400).json({success: false, message: "Must provide title and contents"});
+  }
+    db.update(id, post)
+      .then(response => {
+        if(response == 0) {
+            return res.status(404).json({success: false, message: "Post with ID does not exist"});
+        }
+        db.findById(id)
+          .then(post=> {
+              console.log(post)
+              if(post.length === 0) {
+                return res.status(404).json({success: false, message: "Post with ID does not exist"});
+              }
+              res.json({ post });
+          })
+  
+      })
+      .catch(message => {
+        return res.status(400).json({success: false, message: message});
+      });
+  });
+  
+  
 
 server.listen(8000, () => console.log('API running on port 8000'));

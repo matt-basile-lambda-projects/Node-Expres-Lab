@@ -9,7 +9,8 @@ server.get('/', (req, res) => {
 });
 // Get All Posts
 server.get('/api/posts', (req, res) => {
-    db.find()
+    db
+    .find()
     .then(posts => {
         if(posts){
         res.status(200).json({success: true, posts})
@@ -18,6 +19,36 @@ server.get('/api/posts', (req, res) => {
       }})
       .catch(({code, message}) =>{
         res.status(code).json({success: false, message})
+    })
+});
+//Get Single Post
+server.get('/api/posts/:id', (req, res) => {
+    const {id} = req.params;
+    db
+    .findById(id)
+    .then(posts => { 
+        if(posts){
+        res.status(200).json({success: true, posts})
+      } else{
+        res.status(404).json({success:false, message: 'The post with that ID does not exist.'});
+      }})
+      .catch(({}) =>{
+        res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
+    })
+});
+// Delete Single Post
+server.delete('/api/posts/:id', (req, res) => {
+    const {id} = req.params;
+    db
+    .remove(id)
+    .then(posts => { 
+        if(posts){
+        res.status(204).end();
+      } else{
+        res.status(404).json({success:false, message: 'The post with that ID does not exist.'});
+      }})
+      .catch(({}) =>{
+        res.status(500).json({success:false, message: 'The posts information could not be retrieved.'});
     })
 });
 
